@@ -3,16 +3,14 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"os"
 	"strings"
 )
 
 const LINEBREAK = "\n"
 
 /*
-Diagnostic handler to showcases access to request content (headers, body, method, parameters, etc.)
+Diagnostic handlers to showcases access to request content (headers, body, method, parameters, etc.)
 */
 func diagHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -60,6 +58,7 @@ func diagHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+/*
 func main() {
 
 	// Extract PORT variable from the environment variables
@@ -71,12 +70,14 @@ func main() {
 		port = "8080"
 	}
 
-	// Default handler for requests (just displays information and points to /diag)
+	// Default handlers for requests (just displays information and points to /diag)
 	//http.HandleFunc("/", defaultHandler)
-	// Assign path for diagnostics handler (actual service feature)
+	// Assign path for diagnostics handlers (actual service feature)
 	http.HandleFunc("/diag", diagHandler)
 
 	// Start HTTP server
 	log.Println("Starting server on port " + port + " ...")
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
+
+*/
