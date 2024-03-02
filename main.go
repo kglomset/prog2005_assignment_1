@@ -2,6 +2,7 @@ package main
 
 import (
 	"Assignment_1/handlers"
+	"Assignment_1/util"
 	"log"
 	"net/http"
 )
@@ -18,14 +19,8 @@ func main() {
 		}
 	*/
 
-	bookCount := handlers.GetBookCount
-	http.HandleFunc("/librarystats/v1/bookcount/", bookCount)
-
-	readership := handlers.GetReaderShip
-	http.HandleFunc("/librarystats/v1/readership/", readership)
-
-	status := handlers.GetStatus
-	http.HandleFunc("/librarystats/v1/status/", status)
-
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc(util.BookCountEndPoint, handlers.BookCountHandler)
+	http.HandleFunc(util.ReadershipEndPoint, handlers.readershipRequest)
+	http.HandleFunc(util.StatusEndPoint, handlers.GetStatus)
+	log.Fatal(http.ListenAndServe(util.DefaultPort, nil))
 }
