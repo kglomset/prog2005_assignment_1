@@ -1,12 +1,12 @@
 package util
 
-type BookCount struct {
+type BookCountData struct {
 	Language string  `json:"language"`
 	Books    int     `json:"books"`
 	Authors  int     `json:"authors"`
 	Fraction float64 `json:"fractions"`
 }
-type Readership struct {
+type ReadershipData struct {
 	Country    string `json:"country"`
 	Isocode    string `json:"isocode"`
 	Books      int    `json:"books"`
@@ -26,7 +26,7 @@ type Person struct {
 }
 
 type BookCountResponse struct {
-	Languages []BookCount `json:"languages"`
+	Languages []BookCountData `json:"languages"`
 }
 
 type Book struct {
@@ -35,9 +35,12 @@ type Book struct {
 	Authors []Person `json:"authors"`
 }
 
-type Result struct {
+type BookCountResult struct {
 	Count    int    `json:"count"`
 	Next     string `json:"next"`
 	Previous string `json:"previous"`
 	Results  []Book `json:"results"`
+}
+
+type RestCountriesResponse struct {
 }

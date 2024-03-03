@@ -9,7 +9,16 @@ import (
 	"time"
 )
 
-var startTime = time.Now()
+var startTime time.Time
+
+func StartUptimeTracking() {
+	startTime = time.Now()
+}
+
+func getUptime() float64 {
+	upTime := time.Since(startTime).Seconds()
+	return upTime
+}
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
 	gutendexStatus := checkServiceStatus(util.GutendexEndPoint)
@@ -17,14 +26,13 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	countriesAPIStatus := checkServiceStatus(util.RestCountriesEndPoint)
 
 	//statusMessage := "Service is running"
-	uptimeSeconds := time.Since(startTime).Seconds()
 
 	response := util.Status{
 		GutendexAPI:  gutendexStatus,
 		LanguageAPI:  languageAPIStatus,
 		CountriesAPI: countriesAPIStatus,
 		Version:      "v1",
-		Uptime:       int64(uptimeSeconds),
+		Uptime:       int64(getUptime()),
 	}
 	// Return the status message in the response
 	w.Header().Set("Content-Type", "application/json")

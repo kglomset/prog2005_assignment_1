@@ -42,7 +42,7 @@ func getTotalBookCount() (int, error) {
 	}
 	defer countResponse.Body.Close()
 
-	var totalBookCount util.Result
+	var totalBookCount util.BookCountResult
 	error_2 := json.NewDecoder(countResponse.Body).Decode(&totalBookCount)
 	if error_2 != nil {
 		log.Printf("Failed to decode response from Gutendex API: %v\n", error_2)
@@ -62,7 +62,7 @@ func getAuthorsAndBooks(language string) (int, []util.Book, error) {
 			log.Println(" EDIT THIS STANDARD_ERROR", err1.Error())
 		}
 
-		var result util.Result
+		var result util.BookCountResult
 		err2 := json.NewDecoder(gutendexResponse.Body).Decode(&result)
 		if err2 != nil {
 			log.Println("EDIT THIS DECODING_ERROR"+"of the Gutendex API's respnse.", err2.Error())
@@ -78,7 +78,7 @@ func getAuthorsAndBooks(language string) (int, []util.Book, error) {
 	return totalCount, authorArray, nil
 }
 
-func getBookStats(language string) (util.BookCount, error) {
+func getBookStats(language string) (util.BookCountData, error) {
 	totalCount, authorArray, _ := getAuthorsAndBooks(language)
 	uniqueAuthors := CountUniqueAuthors(authorArray)
 
@@ -86,7 +86,7 @@ func getBookStats(language string) (util.BookCount, error) {
 	totalBooks := totalBookCount
 	fraction := float64(totalBooks) / float64(totalCount)
 
-	return util.BookCount{
+	return util.BookCountData{
 		Language: language,
 		Books:    totalCount,
 		Authors:  uniqueAuthors,
@@ -112,7 +112,7 @@ func bookCountRequest(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var bookStats []util.BookCount
+	var bookStats []util.BookCountData
 	for _, language := range languages {
 		bookStat, err5 := getBookStats(language)
 		if err5 != nil {
