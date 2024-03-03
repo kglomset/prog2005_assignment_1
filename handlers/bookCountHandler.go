@@ -10,13 +10,11 @@ import (
 )
 
 func BookCountHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
+	if r.Method == http.MethodGet {
 		bookCountRequest(w, r)
-	default:
+	} else {
 		http.Error(w, "REST method '"+r.Method+"' is not supported. Try"+
 			" '"+http.MethodGet+"' instead. ", http.StatusNotImplemented)
-		return
 	}
 }
 

@@ -6,6 +6,7 @@ type BookCountData struct {
 	Authors  int     `json:"authors"`
 	Fraction float64 `json:"fractions"`
 }
+
 type ReadershipData struct {
 	Country    string `json:"country"`
 	Isocode    string `json:"isocode"`
@@ -42,5 +43,13 @@ type BookCountResult struct {
 	Results  []Book `json:"results"`
 }
 
-type RestCountriesResponse struct {
+var RestCountriesResponse []struct {
+	//Country    string `json:"common"`
+	Population int `json:"population"`
+}
+
+type Countries struct {
+	IsoCode      string `json:"ISO3166_1_Alpha_2"`
+	OfficialName string `json:"Official_Name"`
+	Language     string `json:"Language"`
 }
