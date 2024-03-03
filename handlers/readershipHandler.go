@@ -27,11 +27,11 @@ func ReadershipRequest(w http.ResponseWriter, r *http.Request) {
 
 	language := parts[4]
 	log.Println(language)
-	population, err0 := retrievePopulationData(language)
+	readershipData, err0 := getReadershipData(language)
 	if err0 != nil {
 		log.Println("Whats is wrong: ", err0)
 	}
-	data, err := json.Marshal(population)
+	data, err := json.MarshalIndent(readershipData, "", " ")
 	if err != nil {
 		log.Println("test")
 	}
@@ -58,12 +58,46 @@ func retrievePopulationData(country string) (int, error) {
 	return util.RestCountriesResponse[0].Population, nil
 }
 
-func retrieveLanguageData() {
+func retrieveLanguageData(language string) ([]util.Countries, error) {
+	lang2countResp, err1 := http.Get(util.L2CEndPoint + language)
+	if err1 != nil {
+		log.Println("Error getting response", err1)
+	}
+	defer lang2countResp.Body.Close()
 
+	var countries []util.Countries
+	err2 := json.NewDecoder(lang2countResp.Body).Decode(&countries)
+	if err2 != nil {
+		log.Println("Problem decoding response men legg til mer her", err2)
+	}
+	return countries, nil
 }
 
-func getReadershipData() {
+func getReadershipData(language string) ([]util.ReadershipData, error) {
+	countries, err1 := retrieveLanguageData(language)
+	if err1 != nil {
+		return nil, err1
+	}
 
+	var readershipData []util.ReadershipData
+	for _, country := range countries {
+		population, err2 := retrievePopulationData(language)
+		if err2 != nil {
+			log.Println("Could not retrieve population data", err2)
+		}
+
+		totalCount, authorArray, _ := getAuthorsAndBooks(language)
+		uniqueAuthors := CountUniqueAuthors(authorArray)
+
+		readershipData = append(readershipData, util.ReadershipData{
+			country.OfficialName,
+			country.IsoCode,
+			totalCount,
+			uniqueAuthors,
+			population,
+		})
+	}
+	return readershipData, nil
 }
 
 /*
