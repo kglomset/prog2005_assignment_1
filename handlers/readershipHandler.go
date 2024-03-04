@@ -81,7 +81,7 @@ func getReadershipData(language string) ([]util.ReadershipData, error) {
 
 	var readershipData []util.ReadershipData
 	for _, country := range countries {
-		population, err2 := retrievePopulationData(language)
+		population, err2 := retrievePopulationData(country.IsoCode)
 		if err2 != nil {
 			log.Println("Could not retrieve population data", err2)
 		}
