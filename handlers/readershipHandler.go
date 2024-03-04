@@ -19,7 +19,6 @@ func ReadershipHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReadershipRequest(w http.ResponseWriter, r *http.Request) {
-
 	parts := strings.Split(r.URL.Path, "/")
 	if len(parts) < 5 {
 		http.Error(w, "Invalid URL path", http.StatusBadRequest)

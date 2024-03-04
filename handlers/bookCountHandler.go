@@ -9,29 +9,33 @@ import (
 	"strings"
 )
 
+// BookCountHandler handles HTTP requests for book count data.
+// It accepts GET requests and delegates the processing to the bookCountRequest function.
+// Any other HTTP method results in a "405 Method Not Allowed" error with a suggestion to use GET.
 func BookCountHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		bookCountRequest(w, r)
 	} else {
-		http.Error(w, "REST method '"+r.Method+"' is not supported. Try"+
-			" '"+http.MethodGet+"' instead. ", http.StatusNotImplemented)
+		http.Error(w, "REST method '"+r.Method+"' is not supported. Please try again with method "+
+			" '"+http.MethodGet+"' instead. ", http.StatusMethodNotAllowed)
 	}
 }
 
+// CountUniqueAuthors counts the number of unique authors present across a slice of books.
+// It excludes authors with empty names and those named "unknown" (case-insensitive).
 func CountUniqueAuthors(books []util.Book) int {
 	uniqueAuthors := make(map[string]bool)
-
 	for _, book := range books {
 		for _, author := range book.Authors {
-			if author.Name != "" {
+			if author.Name != "" && author.Name != "unknown" {
 				uniqueAuthors[author.Name] = true
-
 			}
 		}
 	}
 	return len(uniqueAuthors)
 }
 
+// Gets the total number of books from the Gutendex API and returns it as an integer
 func getTotalBookCount() (int, error) {
 	countResponse, error_1 := http.Get(util.GutendexEndPoint)
 	if error_1 != nil {
@@ -49,6 +53,7 @@ func getTotalBookCount() (int, error) {
 	return totalBookCount.Count, nil
 }
 
+// Retrieves the number of authors and books for a specified language from the Gutendex API
 func getAuthorsAndBooks(language string) (int, []util.Book, error) {
 	var totalCount int
 	var authorArray []util.Book
@@ -76,6 +81,7 @@ func getAuthorsAndBooks(language string) (int, []util.Book, error) {
 	return totalCount, authorArray, nil
 }
 
+// Takes the data that is to compose a struct of type BookCountData, creates the struct and returns it
 func getBookStats(language string) (util.BookCountData, error) {
 	totalCount, authorArray, _ := getAuthorsAndBooks(language)
 	uniqueAuthors := CountUniqueAuthors(authorArray)
@@ -93,6 +99,7 @@ func getBookStats(language string) (util.BookCountData, error) {
 
 }
 
+// Handles the HTTP request for book count data
 func bookCountRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	isoCodes := r.URL.Query().Get("languages")

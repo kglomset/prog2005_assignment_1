@@ -8,8 +8,7 @@ import (
 )
 
 func main() {
-
-	// Put in some error handling for starting the server
+	// Error handling her?
 	handlers.StartUptimeTracking()
 	http.HandleFunc(util.BookCountEndPoint, handlers.BookCountHandler)
 	http.HandleFunc(util.ReadershipEndPoint, handlers.ReadershipHandler)
