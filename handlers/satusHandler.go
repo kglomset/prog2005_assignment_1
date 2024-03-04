@@ -29,8 +29,6 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	languageAPIStatus := checkServiceStatus(util.L2CEndPoint)
 	countriesAPIStatus := checkServiceStatus(util.RestCountriesEndPoint)
 
-	//statusMessage := "Service is running"
-
 	response := util.Status{
 		GutendexAPI:  gutendexStatus,
 		LanguageAPI:  languageAPIStatus,
