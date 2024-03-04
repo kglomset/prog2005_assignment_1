@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -18,7 +19,7 @@ func ReadershipHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReadershipRequest(w http.ResponseWriter, r *http.Request) {
-	// Innmaten til denne inneholder blant annet getReadershipData
+
 	parts := strings.Split(r.URL.Path, "/")
 	if len(parts) < 5 {
 		http.Error(w, "Invalid URL path", http.StatusBadRequest)
@@ -26,8 +27,18 @@ func ReadershipRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	language := parts[4]
-	log.Println(language)
-	readershipData, err0 := getReadershipData(language)
+
+	limit := 0 // Default limit if not provided
+	limitString := r.URL.Query().Get("limit")
+	if limitString != "" {
+		var err error
+		limit, err = strconv.Atoi(limitString)
+		if err != nil || limit <= 0 {
+			http.Error(w, "Invalid limit parameter: must be a positive integer", http.StatusBadRequest)
+			return
+		}
+	}
+	readershipData, err0 := getReadershipData(language, limit)
 	if err0 != nil {
 		log.Println("Whats is wrong: ", err0)
 	}
@@ -73,14 +84,17 @@ func retrieveLanguageData(language string) ([]util.Countries, error) {
 	return countries, nil
 }
 
-func getReadershipData(language string) ([]util.ReadershipData, error) {
+func getReadershipData(language string, limit int) ([]util.ReadershipData, error) {
 	countries, err1 := retrieveLanguageData(language)
 	if err1 != nil {
 		return nil, err1
 	}
 
 	var readershipData []util.ReadershipData
-	for _, country := range countries {
+	for i, country := range countries {
+		if limit > 0 && i >= limit {
+			break
+		}
 		population, err2 := retrievePopulationData(country.IsoCode)
 		if err2 != nil {
 			log.Println("Could not retrieve population data", err2)
