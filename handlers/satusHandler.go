@@ -22,9 +22,9 @@ func getUptime() float64 {
 	return upTime
 }
 
-// GetStatus checks the status of Gutendex API, Language2Countries API and RESTcountries API,
+// GetStatusFromEndPoints checks the status of Gutendex API, Language2Countries API and RESTcountries API,
 // and creates a status struct with the corresponding servicestatus of each endpoint.
-func GetStatus(w http.ResponseWriter, r *http.Request) {
+func GetStatusFromEndPoints(w http.ResponseWriter, r *http.Request) {
 	gutendexStatus := checkServiceStatus(util.GutendexEndPoint)
 	languageAPIStatus := checkServiceStatus(util.L2CEndPoint)
 	countriesAPIStatus := checkServiceStatus(util.RestCountriesEndPoint)
@@ -38,11 +38,16 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	}
 	// Return the status message in the response
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(response)
-	// Handle error in encoding
+
+	statusData, err := json.MarshalIndent(response, "", " ")
 	if err != nil {
 		log.Println("Error encoding response: ", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
+	_, err2 := w.Write(statusData)
+	if err2 != nil {
+		http.Error(w, "Error while writing response", http.StatusInternalServerError)
+		return
 	}
 }
 

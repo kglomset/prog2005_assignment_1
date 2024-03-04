@@ -18,7 +18,7 @@ func TestGetStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			GetStatus(tt.args.w, tt.args.r)
+			GetStatusFromEndPoints(tt.args.w, tt.args.r)
 		})
 	}
 }

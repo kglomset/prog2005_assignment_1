@@ -127,7 +127,7 @@ func bookCountRequest(w http.ResponseWriter, r *http.Request) {
 		bookStats = append(bookStats, bookStat)
 	}
 
-	jsonData, err6 := json.Marshal(bookStats)
+	jsonData, err6 := json.MarshalIndent(bookStats, "", " ")
 	if err6 != nil {
 		http.Error(w, "Do something about this error"+"of Book Count endpoint's statistics.", http.StatusInternalServerError)
 		return

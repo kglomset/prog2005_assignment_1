@@ -12,6 +12,6 @@ func main() {
 	handlers.StartUptimeTracking()
 	http.HandleFunc(util.BookCountEndPoint, handlers.BookCountHandler)
 	http.HandleFunc(util.ReadershipEndPoint, handlers.ReadershipHandler)
-	http.HandleFunc(util.StatusEndPoint, handlers.GetStatus)
+	http.HandleFunc(util.StatusEndPoint, handlers.GetStatusFromEndPoints)
 	log.Fatal(http.ListenAndServe(util.DefaultPort, nil))
 }
