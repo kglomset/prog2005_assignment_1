@@ -10,15 +10,20 @@ import (
 	"strings"
 )
 
+// ReadershipHandler handles HTTP requests for readership data.
 func ReadershipHandler(w http.ResponseWriter, r *http.Request) {
+	// Check if the request method is GET.
 	if r.Method == http.MethodGet {
 		ReadershipRequest(w, r)
 	} else {
-		http.Error(w, "Place some fitting error message here", http.StatusNotImplemented)
+		http.Error(w, "HTTP method not supported", http.StatusNotImplemented)
 	}
 }
 
+// ReadershipRequest handles requests for readership data for a specified language.
 func ReadershipRequest(w http.ResponseWriter, r *http.Request) {
+
+	// Extract language code from request path
 	parts := strings.Split(r.URL.Path, "/")
 	if len(parts) < 5 {
 		http.Error(w, "Invalid URL path", http.StatusBadRequest)
@@ -27,6 +32,7 @@ func ReadershipRequest(w http.ResponseWriter, r *http.Request) {
 
 	language := parts[4]
 
+	// Parse and validate limit parameter from the query string
 	limit := 0 // Default limit if not provided
 	limitString := r.URL.Query().Get("limit")
 	if limitString != "" {
@@ -37,17 +43,23 @@ func ReadershipRequest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	// Retrieve readership data for the specified language and limit
 	readershipData, err0 := getReadershipData(language, limit)
 	if err0 != nil {
-		log.Println("Whats is wrong: ", err0)
+		http.Error(w, "Failed to retrieve readership data.", http.StatusInternalServerError)
 	}
+
+	//Convert readership data to JSON format with indentation
 	data, err := json.MarshalIndent(readershipData, "", " ")
 	if err != nil {
-		log.Println("test")
+		http.Error(w, "Failed to generate book statistics. Please try again later.", http.StatusInternalServerError)
 	}
+
+	// Write JSON data to the response body
 	_, err2 := w.Write(data)
 	if err2 != nil {
-		log.Println("test2")
+		http.Error(w, "Error while writing response.", http.StatusInternalServerError)
 	}
 }
 
@@ -68,40 +80,59 @@ func retrievePopulationData(country string) (int, error) {
 	return util.RestCountriesResponse[0].Population, nil
 }
 
+// retrieveLanguageData retrieves a list of countries associated with a specific language.
+// It fetches data from the Gutendex API endpoint and returns the list as a slice of util.Countries structs.
 func retrieveLanguageData(language string) ([]util.Countries, error) {
+
+	// Make a GET request to the specified API
 	lang2countResp, err1 := http.Get(util.L2CEndPoint + language)
 	if err1 != nil {
-		log.Println("Error getting response", err1)
+		log.Printf("Error retrieving language data from Language2Countries API (language: %s): %v",
+			language, err1)
+		return nil, err1
 	}
 	defer lang2countResp.Body.Close()
 
+	// Decode the JSON response into a slice of util.Countries structs.
 	var countries []util.Countries
 	err2 := json.NewDecoder(lang2countResp.Body).Decode(&countries)
 	if err2 != nil {
-		log.Println("Problem decoding response men legg til mer her", err2)
+		log.Printf("Error decoding response from Gutendex API (language: %s): %v", language, err2)
+		return nil, err2
 	}
 	return countries, nil
 }
 
+// getReadershipData retrieves readership-related data for a given language.
+// It allows limiting the results to a specified number of countries.
 func getReadershipData(language string, limit int) ([]util.ReadershipData, error) {
+
+	// Retrieve a list of countries for the specified language.
 	countries, err1 := retrieveLanguageData(language)
 	if err1 != nil {
 		return nil, err1
 	}
 
+	// Initialize a slice to store the readership data
 	var readershipData []util.ReadershipData
+
+	// Iterate through the countries, potentially limited by the provided limit.
 	for i, country := range countries {
 		if limit > 0 && i >= limit {
 			break
 		}
+
+		// Retrieve population data for the current country.
 		population, err2 := retrievePopulationData(country.IsoCode)
 		if err2 != nil {
 			log.Println("Could not retrieve population data", err2)
 		}
 
+		// Get the total count of books and authors for the language within this country.
 		totalCount, authorArray, _ := getAuthorsAndBooks(language)
 		uniqueAuthors := CountUniqueAuthors(authorArray)
 
+		// Create a ReadershipData struct and append it to the slice.
 		readershipData = append(readershipData, util.ReadershipData{
 			country.OfficialName,
 			country.IsoCode,
@@ -112,17 +143,3 @@ func getReadershipData(language string, limit int) ([]util.ReadershipData, error
 	}
 	return readershipData, nil
 }
-
-/*
-  {
-     "country": "Norway", Hentes fra Language2Countries
-     "isocode": "NO",
-     "books": 21, Hentes fra gutendex - Har allerede metode for denne og
-     "authors": 14, Hentes fra gutendex
-     "readership": 5379475 - Hentes fra restcountries
-  },
-Her er det viktig å få med at det skal hentes land som det snakkes f.eks norsk i hvis no er imput. Det finnes flere
-norsktalende land, og alle disse listes opp i l2c responsen. Dersom det er flere land skal hvert land inn i hver sin entry,
-dette gjelder både country og readership
-
-*/

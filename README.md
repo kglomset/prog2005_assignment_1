@@ -7,9 +7,18 @@ book data relating to one or more specific countries based on an ISO code
 input. It also gives the user the opportunity to check the status of the 
 dependencies used in this project and how long the service has been active for, 
 which are also REST web services. 
-This web service contains three different end points detailed below.
 
+## Use
+The service is deployed on Render at https://prog2005-assignment-1-yvtj.onrender.com.
+In addition to the given URL you have to also provide the endpoints with the correct
+parameters for the given endpoint you want to use. This is detailed for each endpoint below.
 ## Endpoints
+```
+/librarystats/v1/bookcount/
+/librarystats/v1/readership/
+/librarystats/v1/status/
+
+```
 ___
 ### Bookcount
 ```/librarystats/v1/bookcount/```
@@ -87,6 +96,12 @@ Response:
 
 ```
 
-## Deployment
-Render
 ## Dependencies
+The following services has been used for this project. Documentation for
+the given services are provided in the links below:
+- Gutendex API
+  - http://129.241.150.113:8000/
+- Language2Countries API
+  - http://129.241.150.113:3000/
+- REST Countries API
+  - http://129.241.150.113:8080/

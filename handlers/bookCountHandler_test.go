@@ -3,28 +3,38 @@ package handlers
 import (
 	"Assignment_1/util"
 	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
 )
 
+// Tests the BookCountHandler method for correct REST method
 func TestBookCountHandler(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
 	tests := []struct {
-		name string
-		args args
+		name   string
+		method string
+		path   string
+		code   int
 	}{
-		// TODO: Add test cases.
+		{"Method = GET (Status OK)", http.MethodGet, util.BookCountEndPoint,
+			http.StatusOK},
+		{"Method = Post (Status not implemented when " +
+			"using POST method)", http.MethodPost, util.BookCountEndPoint + "something wrong here",
+			http.StatusNotImplemented},
+		{"Method = GET (Status bad request" +
+			" when not specifying language query)", http.MethodGet, util.BookCountEndPoint + "/",
+			http.StatusBadRequest},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			BookCountHandler(tt.args.w, tt.args.r)
+			r := httptest.NewRequest(tt.method, tt.path, nil)
+			w := httptest.NewRecorder()
+			BookCountHandler(w, r)
 		})
 	}
 }
 
+// Tests countUniqueAuthors for successfully counting unique authors
 func TestCountUniqueAuthors(t *testing.T) {
 	type args struct {
 		books []util.Book
@@ -34,7 +44,15 @@ func TestCountUniqueAuthors(t *testing.T) {
 		args args
 		want int
 	}{
-		// TODO: Add test cases.
+		{"Empty slice", args{books: []util.Book{}}, 0},
+		{"Single book with unique author", args{books: []util.Book{{Authors: []util.Person{{
+			"Khabib Nurmagomedov"}}}}}, 1},
+		{"Single book with duplicate author",
+			args{books: []util.Book{{Authors: []util.Person{{
+				"Khabib Nurmagomedov"}, {
+				"Daniel Cormier"}, {
+				"Daniel Cormier"}}}}},
+			2},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -45,6 +63,7 @@ func TestCountUniqueAuthors(t *testing.T) {
 	}
 }
 
+// Tests bookCountRequest for successful language code requests.
 func Test_bookCountRequest(t *testing.T) {
 	type args struct {
 		w http.ResponseWriter
@@ -54,8 +73,18 @@ func Test_bookCountRequest(t *testing.T) {
 		name string
 		args args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Successful request with valid language code",
+			args: args{
+				w: httptest.NewRecorder(),
+				r: func() *http.Request {
+					req, _ := http.NewRequest(http.MethodGet, "/bookcount?lang=no", nil)
+					return req
+				}(),
+			},
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			bookCountRequest(tt.args.w, tt.args.r)
@@ -63,6 +92,7 @@ func Test_bookCountRequest(t *testing.T) {
 	}
 }
 
+// Tests getAuthorsAndBooks for successful request and correct response
 func Test_getAuthorsAndBooks(t *testing.T) {
 	type args struct {
 		language string
@@ -74,7 +104,10 @@ func Test_getAuthorsAndBooks(t *testing.T) {
 		want1   []util.Book
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"Success with non-empty data", args{"br"}, 1, []util.Book{{
+			23685, "Sarmoniou an Aotrou Quere", []util.Person{{Name: "Quéré, Jean"}}}},
+			false},
+		{"Error scenario ", args{language: "gjøvik"}, 0, nil, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -93,6 +126,7 @@ func Test_getAuthorsAndBooks(t *testing.T) {
 	}
 }
 
+// Tests getBookStats for successfully displaying correct data
 func Test_getBookStats(t *testing.T) {
 	type args struct {
 		language string
@@ -103,7 +137,10 @@ func Test_getBookStats(t *testing.T) {
 		want    util.BookCountData
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"Success with non-empty data", args{"no"},
+			util.BookCountData{"no", 21, 16, 0.000288}, false},
+		{"Success with non-empty data", args{"fi"},
+			util.BookCountData{"fi", 2834, 887, 0.038839}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -119,13 +156,14 @@ func Test_getBookStats(t *testing.T) {
 	}
 }
 
+// Tests getTotalBookCount for the correct amount of books on Gutendex API
 func Test_getTotalBookCount(t *testing.T) {
 	tests := []struct {
 		name    string
 		want    int
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"Total bookcount is correct", 72968, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

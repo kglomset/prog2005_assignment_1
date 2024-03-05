@@ -1,41 +1,11 @@
 package handlers
 
 import (
-	"net/http"
+	"Assignment_1/util"
 	"testing"
 )
 
-func TestGetStatus(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			GetStatusFromEndPoints(tt.args.w, tt.args.r)
-		})
-	}
-}
-
-func TestStartUptimeTracking(t *testing.T) {
-	tests := []struct {
-		name string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			StartUptimeTracking()
-		})
-	}
-}
-
+// Tests the service status for the three endpoints used in the project
 func Test_checkServiceStatus(t *testing.T) {
 	type args struct {
 		serviceURL string
@@ -45,28 +15,14 @@ func Test_checkServiceStatus(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{"Gutendex status OK", args{serviceURL: util.GutendexEndPoint}, "200: OK"},
+		{"Language2Countries status OK", args{serviceURL: util.L2CEndPoint + "/no"}, "200: OK"},
+		{"REST Countries status OK", args{serviceURL: util.RestCountriesEndPoint + "no"}, "200: OK"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := checkServiceStatus(tt.args.serviceURL); got != tt.want {
 				t.Errorf("checkServiceStatus() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_getUptime(t *testing.T) {
-	tests := []struct {
-		name string
-		want float64
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getUptime(); got != tt.want {
-				t.Errorf("getUptime() = %v, want %v", got, tt.want)
 			}
 		})
 	}
