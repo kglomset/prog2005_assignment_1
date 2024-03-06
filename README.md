@@ -10,8 +10,8 @@ which are also REST web services.
 
 ## Use
 The service is deployed on Render at https://prog2005-assignment-1-yvtj.onrender.com.
-In addition to the given URL you have to also provide the endpoints with the correct
-parameters for the given endpoint you want to use. This is detailed for each endpoint below.
+In addition to the given URL you have to also provide one of the endpoints with the correct
+parameters you want to use. Examples are shown below. 
 ## Endpoints
 ```
 /librarystats/v1/bookcount/
