@@ -18,7 +18,6 @@ func main() {
 	http.HandleFunc(util.StatusEndPoint, handlers.GetStatusFromEndPoints)
 
 	if err := http.ListenAndServe(util.DefaultPort, nil); err != nil {
-		// Check for specific errors and handle accordingly, for example:
 		if errors.Is(err, http.ErrServerClosed) {
 			log.Println("Server gracefully shut down")
 		} else {
