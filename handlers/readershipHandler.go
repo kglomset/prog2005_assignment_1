@@ -47,7 +47,7 @@ func ReadershipRequest(w http.ResponseWriter, r *http.Request) {
 	// Retrieve readership data for the specified language and limit
 	readershipData, err0 := getReadershipData(language, limit)
 	if err0 != nil {
-		http.Error(w, "Failed to retrieve readership data.", http.StatusInternalServerError)
+		http.Error(w, "Failed to retrieve readership data. Please check parameters", http.StatusInternalServerError)
 	}
 
 	//Convert readership data to JSON format with indentation
@@ -63,8 +63,9 @@ func ReadershipRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// retrievePopulationData retrieves population data from the RestCountries API for a given country.
+// It returns the population and an error if any occurs during the process.
 func retrievePopulationData(country string) (int, error) {
-	//var populationData util.RestCountriesResponse
 	url := fmt.Sprintf(util.RestCountriesEndPoint+"%s", country)
 	restCountriesResp, err := http.Get(url)
 	if err != nil {
@@ -72,12 +73,14 @@ func retrievePopulationData(country string) (int, error) {
 	}
 	defer restCountriesResp.Body.Close()
 
-	err = json.NewDecoder(restCountriesResp.Body).Decode(&util.RestCountriesResponse)
+	var restCountriesData util.RestCountriesData
+
+	err = json.NewDecoder(restCountriesResp.Body).Decode(&restCountriesData)
 	if err != nil {
 		log.Printf("Error decoding response from RestCountries API: %v\n", err)
 	}
 
-	return util.RestCountriesResponse[0].Population, nil
+	return restCountriesData[0].Population, nil
 }
 
 // retrieveLanguageData retrieves a list of countries associated with a specific language.

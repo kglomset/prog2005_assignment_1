@@ -51,9 +51,8 @@ type BookCountResult struct {
 	Results  []Book `json:"results"`
 }
 
-// Represents a response from the Restcountries API
-var RestCountriesResponse []struct {
-	//Country    string `json:"common"`
+// The struct from which a response from the Restcountries API is saved in
+type RestCountriesData []struct {
 	Population int `json:"population"`
 }
 
